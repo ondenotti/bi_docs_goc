@@ -1,0 +1,102 @@
+COMO PUBLICAR ESTE SITE DE DOCUMENTAÇÃO
+=======================================
+
+O que é: um site que lê seus arquivos .md e os renderiza formatados, sem
+build, sem Node, sem compilar nada. É só uma pasta de arquivos estáticos.
+
+ESTRUTURA
+---------
+index.html     -> o renderizador (tema escuro já configurado). Mexa só se
+                  quiser trocar cores/nome — as cores estão no topo, em :root.
+_sidebar.md    -> o menu lateral. Cada linha é um link para um .md.
+README.md      -> a página inicial do site.
+_404.md        -> página de "não encontrado".
+.nojekyll      -> necessário se publicar no GitHub Pages.
+_redirects     -> usado pela Netlify (pode ignorar nos outros).
+*.md           -> seus documentos. Jogue quantos quiser aqui.
+
+PARA ADICIONAR UM DOCUMENTO NOVO
+--------------------------------
+1. Copie o .md para dentro desta pasta.
+2. Abra _sidebar.md e acrescente uma linha, por exemplo:
+     * [Margem de Serviços](margem_servicos.md)
+3. Publique de novo (ou dê git push, se estiver usando GitHub).
+Só isso. Nada de recompilar.
+
+PUBLICANDO — OPÇÃO A: NETLIFY DROP (mais rápida, 2 minutos)
+-----------------------------------------------------------
+1. Acesse app.netlify.com/drop
+2. Arraste a pasta bi-docs inteira para a área indicada.
+3. Pronto: você recebe uma URL do tipo nome-aleatorio.netlify.app
+4. Em "Site configuration > Change site name" troque para algo como
+   docs-bi-suaempresa.netlify.app
+Para atualizar depois: no painel do site, aba "Deploys", arraste a pasta
+de novo. O endereço continua o mesmo — então o botão no Power BI nunca quebra.
+
+PUBLICANDO — OPÇÃO B: GITHUB + CLOUDFLARE PAGES (melhor a médio prazo)
+-----------------------------------------------------------------------
+1. Crie um repositório no GitHub e suba esta pasta.
+2. Em dash.cloudflare.com > Workers & Pages > Create > Pages > conecte o repo.
+3. Build command: deixe VAZIO. Output directory: / (a raiz).
+4. A cada git push o site atualiza sozinho, e fica o histórico de versões
+   de cada documento.
+
+LINK DIRETO PARA UM DOCUMENTO (é o que você vai usar no BI)
+-----------------------------------------------------------
+A home:              https://seusite.netlify.app/
+Um documento:        https://seusite.netlify.app/#/NET_para_usuarios_do_BI
+Direto numa seção:   https://seusite.netlify.app/#/NET_para_usuarios_do_BI?id=em-uma-frase
+
+Repare no "#/" e que o ".md" não aparece na URL. Para o link de uma seção
+específica, não tente montar o "?id=" na mão: abra o site, clique no item
+no menu lateral e copie a URL da barra de endereços. É o jeito garantido.
+
+No Power BI: Inserir > Botão (ou Imagem) > Ação > Tipo: URL da Web > cole o
+link. O usuário clica segurando Ctrl no Desktop; no publicado na web o
+clique é direto.
+
+TESTANDO NO SEU COMPUTADOR ANTES DE PUBLICAR
+--------------------------------------------
+ATENÇÃO: abrir o index.html com dois cliques (file://) NÃO funciona — o
+navegador bloqueia a leitura dos .md. Você precisa de um servidor local.
+Se tiver Node instalado, abra o terminal nesta pasta e rode:
+    npx serve
+Depois abra o endereço que ele mostrar (normalmente http://localhost:3000).
+Se tiver Python:
+    python -m http.server 8000
+e abra http://localhost:8000
+Se não tiver nenhum dos dois, simplesmente publique na Netlify — lá funciona.
+
+E SE O CONTEÚDO FOR INTERNO E NÃO PUDER FICAR ABERTO?
+------------------------------------------------------
+Por padrão o site é público (quem tiver o link, vê). Se precisar restringir:
+- Cloudflare Pages + Cloudflare Access (Zero Trust): gratuito até 50
+  usuários, exige login por e-mail corporativo antes de abrir a página.
+- Netlify: proteção por senha existe, mas é recurso de plano pago.
+Nenhuma das duas é mais trabalhosa que o PDF no OneDrive público que você
+usa hoje — e a Access é bem mais segura que isso.
+
+TROCANDO AS CORES / O NOME
+--------------------------
+No index.html, bloco :root (começo do arquivo):
+  --brand        cor principal: títulos, item ativo do menu, marcações
+  --brand-light  versão clara da mesma cor, para links e textos pequenos
+  --brand-dim    fundo suave da cor principal (citações, item ativo)
+  --bg           fundo da página
+  --bg-sidebar   fundo do menu
+E mais abaixo, em window.$docsify, o campo name: 'Documentação BI'.
+
+Por que duas cores de marca: #5871D0 tem contraste suficiente para texto
+grande (títulos), mas em letra de 13px sobre fundo escuro fica apagado.
+Por isso links e itens de menu usam --brand-light, um tom mais claro da
+mesma família. Se trocar --brand, clareie --brand-light junto.
+
+SOBRE A BUSCA
+-------------
+A busca é uma implementação própria (está no fim do index.html), não o
+plugin padrão do Docsify. Diferença: ela procura o TRECHO INTEIRO digitado,
+como um LIKE '%texto%', em vez de quebrar a frase em palavras soltas.
+Ignora maiúsculas/minúsculas e também acentuação — "estagio" acha "estágio"
+e "monofasica" acha "monofásica". Atalho: a tecla "/" pula para o campo.
+Ela indexa todos os .md que estiverem linkados no _sidebar.md, então um
+documento que não esteja no menu não entra na busca.

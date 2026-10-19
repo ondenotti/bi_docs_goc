@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Documentação BI</title>
+  <meta name="description" content="Documentação de apoio aos painéis de BI">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📘</text></svg>">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ===============================================================
+       CORES — mexa só aqui para mudar a identidade visual do site
+       =============================================================== */
+    :root {
+      --brand:         #5871D0;  /* cor principal: títulos, item ativo, marcações */
+      --brand-light:   #8fa2ea;  /* versão clara: links e textos pequenos (legibilidade) */
+      --brand-dim:     rgba(88, 113, 208, .14); /* fundo suave da cor principal */
+
+      --bg:            #1b1d21;  /* fundo da página */
+      --bg-sidebar:    #17181c;  /* fundo do menu lateral */
+      --bg-code:       #22252a;  /* fundo de blocos de código e cabeçalho de tabela */
+      --border:        #2e3238;
+      --text:          #d6d9de;  /* texto comum */
+      --text-strong:   #ffffff;  /* negrito */
+      --text-muted:    #8b929c;  /* texto secundário */
+
+      --radius:        8px;
+      --content-max:   880px;
+    }
+    /* Observação: títulos usam --brand; links dentro do texto e itens do menu
+       usam --brand-light, porque em corpo de texto pequeno o tom cheio fica
+       escuro demais sobre fundo preto. As duas cores são da mesma família. */
+
+    html, body { background: var(--bg); }
+    body {
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===============================================================
+       MENU LATERAL
+       =============================================================== */
+    .sidebar {
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--border);
+      padding: 0;
+    }
+    .sidebar > h1 { margin: 16px 0 4px; padding: 0 16px; text-align: left; }
+    .sidebar > h1 a, .sidebar .app-name-link {
+      color: var(--text-strong);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+    }
+    .sidebar-nav { padding: 4px 10px 40px; }
+
+    /* Zera toda a indentação herdada do tema: a hierarquia é controlada
+       explicitamente nas regras abaixo, por nível, sem acumular. */
+    .sidebar ul,
+    .sidebar ul li,
+    .sidebar ul li ul,
+    .sidebar .app-sub-sidebar,
+    .sidebar .app-sub-sidebar .app-sub-sidebar {
+      margin: 0 !important;
+      padding-left: 0 !important;
+      list-style: none !important;
+    }
+    .sidebar li::before,
+    .sidebar .app-sub-sidebar li::before { content: none !important; }
+
+    .sidebar ul li a {
+      display: block;
+      color: var(--text-muted);
+      font-size: 13.5px;
+      line-height: 1.4;
+      padding: 5px 10px 5px 12px;
+      margin: 1px 0;
+      border-left: 2px solid transparent;
+      border-radius: 0 4px 4px 0;
+      white-space: normal;      /* deixa o título quebrar em vez de cortar com "..." */
+      overflow: visible;
+      text-overflow: clip;
+      transition: color .12s, background .12s, border-color .12s;
+    }
+    .sidebar ul li a:hover {
+      color: var(--text-strong);
+      background: rgba(255,255,255,.04);
+      text-decoration: none;
+    }
+    .sidebar ul li.active > a,
+    .sidebar ul li > a.active {
+      color: var(--brand-light);
+      font-weight: 600;
+      background: var(--brand-dim);
+      border-left-color: var(--brand);
+    }
+
+    /* Títulos de grupo do _sidebar.md (linhas em **negrito** sem link) */
+    .sidebar-nav > ul > li > p,
+    .sidebar-nav > ul > li > strong,
+    .sidebar-nav > ul > li > p > strong {
+      display: block;
+      color: var(--text-muted);
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      margin: 18px 0 4px;
+      padding: 0 12px;
+      opacity: .75;
+    }
+
+    /* Sumário do documento aberto (gerado a partir dos títulos do .md) */
+    .sidebar .app-sub-sidebar { margin-top: 2px !important; }
+    .sidebar .app-sub-sidebar li a {           /* nível ## */
+      padding-left: 26px;
+      font-size: 13px;
+    }
+    .sidebar .app-sub-sidebar .app-sub-sidebar li a {   /* nível ### */
+      padding-left: 40px;
+      font-size: 12.5px;
+      opacity: .92;
+    }
+    .sidebar-toggle { background: transparent; }
+    .sidebar-toggle span { background-color: var(--text-muted); }
+
+    /* ===============================================================
+       BUSCA (implementação própria — ver script no fim do arquivo)
+       =============================================================== */
+    .doc-search { padding: 14px 12px 10px; border-bottom: 1px solid var(--border); }
+    .doc-search input {
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13.5px;
+      padding: 8px 10px;
+      outline: none;
+      transition: border-color .12s;
+    }
+    .doc-search input:focus { border-color: var(--brand); }
+    .doc-search input::placeholder { color: var(--text-muted); }
+
+    .doc-search-count {
+      color: var(--text-muted);
+      font-size: 11px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      padding: 10px 12px 4px;
+    }
+    .doc-search-results { padding-bottom: 30px; }
+    .doc-search-hit {
+      display: block;
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--border);
+      border-left: 2px solid transparent;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .doc-search-hit:hover { background: rgba(255,255,255,.04); border-left-color: var(--brand); }
+    .doc-search-hit .hit-doc {
+      display: block;
+      color: var(--text-muted);
+      font-size: 10.5px;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .doc-search-hit .hit-title {
+      display: block;
+      color: var(--brand-light);
+      font-size: 13.5px;
+      font-weight: 600;
+      line-height: 1.35;
+      margin-bottom: 3px;
+    }
+    .doc-search-hit .hit-snippet {
+      display: block;
+      color: var(--text-muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .doc-search mark {
+      background: rgba(88,113,208,.32);
+      color: var(--text-strong);
+      border-radius: 2px;
+      padding: 0 1px;
+    }
+    .doc-search-empty { color: var(--text-muted); font-size: 12.5px; padding: 16px 12px; line-height: 1.5; }
+
+    /* ===============================================================
+       CONTEÚDO
+       =============================================================== */
+    .content { background: var(--bg); }
+    .markdown-section {
+      max-width: var(--content-max);
+      padding: 36px 32px 90px;
+      color: var(--text);
+      font-size: 15.5px;
+      line-height: 1.75;
+    }
+    .markdown-section h1,
+    .markdown-section h2,
+    .markdown-section h3,
+    .markdown-section h4,
+    .markdown-section h5,
+    .markdown-section h6 {
+      color: var(--brand);
+      scroll-margin-top: 24px;
+    }
+    .markdown-section h1 {
+      font-size: 2.05rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin: 0 0 1.1rem;
+    }
+    .markdown-section h2 {
+      font-size: 1.45rem;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      margin: 2.5rem 0 1rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .markdown-section h3 { font-size: 1.15rem; font-weight: 600; margin: 1.8rem 0 .7rem; }
+    .markdown-section h4 { font-size: 1rem; font-weight: 600; margin: 1.4rem 0 .5rem; }
+    .markdown-section p, .markdown-section li { color: var(--text); }
+    .markdown-section strong { color: var(--text-strong); font-weight: 600; }
+    .markdown-section a { color: var(--brand-light); text-decoration: none; }
+    .markdown-section a:hover { text-decoration: underline; }
+    .markdown-section hr { border: none; border-top: 1px solid var(--border); margin: 2.2rem 0; }
+    .markdown-section ul, .markdown-section ol { padding-left: 1.4rem; }
+    .markdown-section li { margin: .35rem 0; }
+
+    /* Âncora que aparece ao passar o mouse no título */
+    .markdown-section h1 a, .markdown-section h2 a,
+    .markdown-section h3 a, .markdown-section h4 a { color: inherit; }
+
+    /* Destaque momentâneo ao chegar por um resultado de busca */
+    @keyframes hitFlash {
+      from { background: rgba(88,113,208,.28); }
+      to   { background: transparent; }
+    }
+    .markdown-section .search-hit {
+      animation: hitFlash 1.6s ease-out;
+      border-radius: 4px;
+    }
+
+    /* Código */
+    .markdown-section code, .markdown-section pre {
+      font-family: 'JetBrains Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
+    }
+    .markdown-section p > code,
+    .markdown-section li > code,
+    .markdown-section td > code {
+      background: var(--bg-code);
+      color: #e0a96d;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: .87em;
+    }
+    .markdown-section pre {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0;
+      margin: 1.4rem 0;
+    }
+    .markdown-section pre > code {
+      background: transparent;
+      color: #d6d9de;
+      font-size: 13.5px;
+      line-height: 1.65;
+      padding: 18px 20px;
+    }
+    .markdown-section pre::after { display: none; }
+
+    /* Tabelas */
+    .markdown-section table {
+      display: table;
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      border-collapse: collapse;
+      overflow: hidden;
+      margin: 1.5rem 0;
+      font-size: 14.5px;
+    }
+    .markdown-section th {
+      background: var(--bg-code);
+      color: var(--text-strong);
+      font-weight: 600;
+      text-align: left;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      padding: 11px 14px;
+    }
+    .markdown-section td {
+      border: none;
+      border-bottom: 1px solid var(--border);
+      padding: 11px 14px;
+    }
+    .markdown-section tr:last-child td { border-bottom: none; }
+    .markdown-section tr:nth-child(2n) { background: rgba(255,255,255,.015); }
+    /* Tabelas de duas colunas sem cabeçalho (valor | número) ficam melhor
+       com a segunda coluna alinhada à direita */
+    .markdown-section table thead th:empty { padding: 0; height: 0; border: none; }
+
+    /* Citações */
+    .markdown-section blockquote {
+      background: var(--brand-dim);
+      border-left: 3px solid var(--brand);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      color: var(--text);
+      margin: 1.4rem 0;
+      padding: 14px 18px;
+    }
+    .markdown-section blockquote p { margin: 0; }
+
+    /* Botão copiar código */
+    .docsify-copy-code-button {
+      background: var(--bg-code) !important;
+      color: var(--text-muted) !important;
+      border: 1px solid var(--border) !important;
+      border-radius: 5px !important;
+      font-size: 12px !important;
+      padding: 4px 9px !important;
+      top: 8px !important;
+      right: 8px !important;
+    }
+    .docsify-copy-code-button:hover { color: var(--text-strong) !important; }
+    .docsify-copy-code-button span { display: none; }
+
+    /* Rodapé anterior/próximo */
+    .docsify-pagination-container { border-top: 1px solid var(--border); }
+    .pagination-item-title { color: var(--text-muted); }
+    .pagination-item-label { color: var(--brand-light); }
+
+    .progress { background-color: var(--brand); height: 2px; }
+
+    @media screen and (max-width: 768px) {
+      .markdown-section { padding: 24px 18px 60px; }
+      .markdown-section h1 { font-size: 1.65rem; }
+    }
+
+    /* Realce de sintaxe */
+    .token.comment, .token.prolog, .token.doctype, .token.cdata { color: #6b7280; }
+    .token.punctuation { color: #9aa2ad; }
+    .token.property, .token.tag, .token.boolean, .token.number,
+    .token.constant, .token.symbol { color: #e0a96d; }
+    .token.selector, .token.attr-name, .token.string, .token.char,
+    .token.builtin { color: #9ece6a; }
+    .token.operator, .token.entity, .token.url { color: #89ddff; }
+    .token.atrule, .token.attr-value, .token.keyword { color: #b48ee8; }
+    .token.function, .token.class-name { color: #8fa2ea; }
+  </style>
+</head>
+<body>
+  <div id="app">Carregando…</div>
+
+  <script>
+    window.$docsify = {
+      name: 'Documentação BI',
+      nameLink: '#/',
+      loadSidebar: true,       // usa o arquivo _sidebar.md
+      subMaxLevel: 3,          // mostra ## e ### no menu
+      auto2top: true,
+      maxLevel: 4,
+      relativePath: false,
+      notFoundPage: true,
+
+      pagination: {
+        previousText: 'Anterior',
+        nextText: 'Próximo',
+        crossChapter: true,
+        crossChapterText: true
+      }
+      // A busca NÃO é configurada aqui: é um plugin próprio, no fim do arquivo.
+    };
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-copy-code@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-pagination@2/dist/docsify-pagination.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-sql.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-python.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
+
+  <!-- ===================================================================
+       BUSCA POR TRECHO (comporta-se como LIKE '%texto%')
+       - procura a frase inteira, na ordem em que foi digitada
+       - ignora maiúsculas/minúsculas
+       - ignora acentuação ("estagio" acha "estágio", e vice-versa)
+       Substitui o plugin oficial, que quebra a frase em palavras soltas.
+       =================================================================== -->
+  <script>
+  (function () {
+    var MIN = 2;          // nº mínimo de caracteres para buscar
+    var MAX_HITS = 40;    // nº máximo de resultados exibidos
+
+    /* Normaliza caractere a caractere, guardando o índice original de cada
+       letra. É isso que permite destacar o trecho certo no texto acentuado. */
+    function normMap(str) {
+      var out = '', map = [], i, k, c;
+      for (i = 0; i < str.length; i++) {
+        c = str[i].normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+        for (k = 0; k < c.length; k++) { out += c[k]; map.push(i); }
+      }
+      return { out: out, map: map };
+    }
+    function norm(s) {
+      return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+    }
+
+    /* Markdown -> texto corrido, para o trecho de pré-visualização */
+    function plain(md) {
+      return md
+        .replace(/```[\s\S]*?```/g, ' ')
+        .replace(/`([^`]*)`/g, '$1')
+        .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+        .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+        .replace(/^\s{0,3}[>\-\+\*]\s+/gm, ' ')
+        .replace(/^\s*\|?[-: |]+\|\s*$/gm, ' ')
+        .replace(/[|#*]/g, ' ')   /* o "_" fica: nomes de coluna como origem_piscofins_net */
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    var sections = null, buildingPromise = null, pendingScroll = null;
+
+    function basePath() {
+      var b = (window.$docsify && window.$docsify.basePath) || '';
+      if (b && b.slice(-1) !== '/') b += '/';
+      return b;
+    }
+
+    function fetchText(url) {
+      return fetch(url, { cache: 'no-cache' })
+        .then(function (r) { return r.ok ? r.text() : ''; })
+        .catch(function () { return ''; });
+    }
+
+    /* Descobre quais .md indexar lendo os links do _sidebar.md */
+    function listPaths() {
+      return fetchText(basePath() + '_sidebar.md').then(function (txt) {
+        var paths = ['README.md'], re = /\]\(([^)]+)\)/g, m, p;
+        while ((m = re.exec(txt))) {
+          p = m[1].trim().split(/\s+/)[0];
+          if (/^(https?:|#|mailto:)/i.test(p)) continue;
+          if (p === '/' || p === '') p = 'README.md';
+          if (!/\.md$/i.test(p)) continue;
+          p = p.replace(/^\.?\//, '');
+          if (paths.indexOf(p) === -1) paths.push(p);
+        }
+        return paths;
+      });
+    }
+
+    /* Quebra cada documento em seções, uma por título */
+    function indexDoc(path, text) {
+      var out = [], lines = text.split('\n'), docTitle = path.replace(/\.md$/i, '');
+      var cur = null, inFence = false, h, level, title;
+      function close() {
+        if (!cur) return;
+        cur.text = plain(cur.raw);
+        cur.full = cur.title + ' · ' + cur.text;
+        var nm = normMap(cur.full);
+        cur.n = nm.out; cur.map = nm.map;
+        delete cur.raw;
+        out.push(cur);
+      }
+      for (var i = 0; i < lines.length; i++) {
+        if (/^\s*```/.test(lines[i])) inFence = !inFence;
+        h = inFence ? null : lines[i].match(/^(#{1,6})\s+(.+?)\s*#*\s*$/);
+        if (h) {
+          close();
+          level = h[1].length;
+          title = h[2].replace(/[`*]/g, '').trim();
+          if (level === 1) docTitle = title;
+          cur = { path: path, docTitle: docTitle, title: title, level: level, raw: '' };
+        } else if (cur) {
+          cur.raw += lines[i] + '\n';
+        }
+      }
+      close();
+      // Garante que o nome do documento fique igual em todas as seções
+      out.forEach(function (s) { s.docTitle = docTitle; });
+      return out;
+    }
+
+    function buildIndex() {
+      if (sections) return Promise.resolve(sections);
+      if (buildingPromise) return buildingPromise;
+      buildingPromise = listPaths().then(function (paths) {
+        return Promise.all(paths.map(function (p) {
+          return fetchText(basePath() + p).then(function (t) {
+            return t ? indexDoc(p, t) : [];
+          });
+        }));
+      }).then(function (groups) {
+        sections = [].concat.apply([], groups);
+        return sections;
+      });
+      return buildingPromise;
+    }
+
+    function search(q) {
+      var nq = norm(q.trim()).replace(/\s+/g, ' ');
+      if (nq.length < MIN || !sections) return [];
+      var hits = [];
+      for (var i = 0; i < sections.length && hits.length < MAX_HITS; i++) {
+        var s = sections[i], at = s.n.indexOf(nq);
+        if (at === -1) continue;
+        hits.push({ s: s, start: s.map[at], end: s.map[Math.min(at + nq.length - 1, s.map.length - 1)] + 1 });
+      }
+      return hits;
+    }
+
+    function routeFor(path) {
+      return /^README\.md$/i.test(path) ? '#/' : '#/' + path.replace(/\.md$/i, '');
+    }
+
+    function scrollToHeading(title) {
+      var want = title.replace(/\s+/g, ' ').trim();
+      var hs = document.querySelectorAll('.markdown-section h1, .markdown-section h2, .markdown-section h3, .markdown-section h4, .markdown-section h5, .markdown-section h6');
+      for (var i = 0; i < hs.length; i++) {
+        if (hs[i].textContent.replace(/\s+/g, ' ').trim() === want) {
+          hs[i].scrollIntoView({ behavior: 'smooth', block: 'start' });
+          hs[i].classList.add('search-hit');
+          (function (el) { setTimeout(function () { el.classList.remove('search-hit'); }, 1700); })(hs[i]);
+          return;
+        }
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    window.$docsify.plugins = [].concat(function (hook) {
+      hook.mounted(function () {
+        var sidebar = document.querySelector('.sidebar');
+        if (!sidebar) return;
+
+        var box = document.createElement('div');
+        box.className = 'doc-search';
+        box.innerHTML =
+          '<input type="search" autocomplete="off" spellcheck="false" placeholder="Buscar na documentação…">' +
+          '<div class="doc-search-panel" style="display:none"></div>';
+        sidebar.insertBefore(box, sidebar.firstChild);
+
+        var input = box.querySelector('input');
+        var panel = box.querySelector('.doc-search-panel');
+        var timer;
+
+        function nav() { return document.querySelector('.sidebar-nav'); }
+        function showNav() {
+          panel.style.display = 'none';
+          panel.innerHTML = '';
+          if (nav()) nav().style.display = '';
+        }
+
+        function render(q, hits) {
+          if (nav()) nav().style.display = 'none';
+          panel.style.display = '';
+          panel.innerHTML = '';
+
+          if (!hits.length) {
+            var none = document.createElement('div');
+            none.className = 'doc-search-empty';
+            none.textContent = 'Nenhuma ocorrência de “' + q.trim() + '”.';
+            panel.appendChild(none);
+            return;
+          }
+
+          var count = document.createElement('div');
+          count.className = 'doc-search-count';
+          count.textContent = hits.length + (hits.length === 1 ? ' ocorrência' : ' ocorrências');
+          panel.appendChild(count);
+
+          var list = document.createElement('div');
+          list.className = 'doc-search-results';
+
+          hits.forEach(function (h) {
+            var s = h.s;
+            var item = document.createElement('a');
+            item.className = 'doc-search-hit';
+            item.href = routeFor(s.path);
+
+            var doc = document.createElement('span');
+            doc.className = 'hit-doc';
+            doc.textContent = s.docTitle;
+
+            var tit = document.createElement('span');
+            tit.className = 'hit-title';
+            tit.textContent = s.title;
+
+            // Trecho com o pedaço encontrado destacado
+            var from = Math.max(0, h.start - 60);
+            var to = Math.min(s.full.length, h.end + 110);
+            var snip = document.createElement('span');
+            snip.className = 'hit-snippet';
+            if (from > 0) snip.appendChild(document.createTextNode('…'));
+            snip.appendChild(document.createTextNode(s.full.slice(from, h.start)));
+            var mk = document.createElement('mark');
+            mk.textContent = s.full.slice(h.start, h.end);
+            snip.appendChild(mk);
+            snip.appendChild(document.createTextNode(s.full.slice(h.end, to)));
+            if (to < s.full.length) snip.appendChild(document.createTextNode('…'));
+
+            item.appendChild(doc);
+            item.appendChild(tit);
+            item.appendChild(snip);
+
+            item.addEventListener('click', function (e) {
+              e.preventDefault();
+              var route = routeFor(s.path);
+              var cur = (location.hash.split('?')[0] || '#/');
+              if (cur === '' || cur === '#') cur = '#/';
+              input.value = '';
+              showNav();
+              if (cur === route) {
+                scrollToHeading(s.title);
+              } else {
+                pendingScroll = s.title;
+                location.hash = route;
+              }
+            });
+
+            list.appendChild(item);
+          });
+
+          panel.appendChild(list);
+        }
+
+        function run() {
+          var q = input.value;
+          if (norm(q.trim()).length < MIN) { showNav(); return; }
+          buildIndex().then(function () { render(q, search(q)); });
+        }
+
+        input.addEventListener('input', function () {
+          clearTimeout(timer);
+          timer = setTimeout(run, 120);
+        });
+        input.addEventListener('focus', buildIndex);
+        input.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') { input.value = ''; showNav(); input.blur(); }
+        });
+
+        // Atalho: "/" coloca o cursor na busca
+        document.addEventListener('keydown', function (e) {
+          if (e.key === '/' && document.activeElement !== input &&
+              !/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) {
+            e.preventDefault();
+            input.focus();
+          }
+        });
+      });
+
+      hook.doneEach(function () {
+        if (!pendingScroll) return;
+        var title = pendingScroll;
+        pendingScroll = null;
+        setTimeout(function () { scrollToHeading(title); }, 80);
+      });
+    }, window.$docsify.plugins || []);
+  })();
+  </script>
+</body>
+</html>
