@@ -6,6 +6,7 @@
 
 * **Indicadores**
   * [Compra NET](NET_para_usuarios_do_BI.md)
+  * [Compra NET (Técnico)](NET_documentacao_tecnica.md)
 
 * **Outros assuntos**
   <!-- * [Nome que aparece no menu](nome_do_arquivo.md) -->

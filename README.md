@@ -12,7 +12,7 @@ significa, de onde ele vem e como lê-lo sem tropeçar.
 | Documento | Sobre o que é | Última revisão |
 |---|---|---|
 | [Compra NET](NET_para_usuarios_do_BI.md) | O que o valor NET é, o que não é, e como o número é montado | 16/10/2026 |
-| [Compra NET](NET_documentacao_tecnica.md) | Para quem dá manutenção na fato, no script SQL ou no modelo do Power BI | 16/10/2026 |
+| [Compra NET (Técnico)](NET_documentacao_tecnica.md) | Para quem dá manutenção na fato, no script SQL ou no modelo do Power BI | 16/10/2026 |
 
 ---
 
