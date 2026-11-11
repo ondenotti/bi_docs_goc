@@ -29,7 +29,7 @@ de outras entradas e saídas**. O que varia é o **custo** da linha original
 O reprocessamento é a rotina de custo médio do Solution. Ela deixa um carimbo
 na linha, em `e51campo_livre_c15`:
 
-```
+```text
 ESTOQUE.ESTCUSTOMEDIOREPROCESSAR  03/07/2025 07:43:20
 ```
 

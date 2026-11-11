@@ -275,6 +275,18 @@
     .markdown-section h3 { font-size: 1.15rem; font-weight: 600; margin: 1.8rem 0 .7rem; }
     .markdown-section h4 { font-size: 1rem; font-weight: 600; margin: 1.4rem 0 .5rem; }
     .markdown-section p, .markdown-section li { color: var(--text); }
+    /* Texto justificado, com hifenização em português (o <html> tem
+       lang="pt-BR"). Vale só para parágrafos, itens de lista e citações:
+       tabelas, código e títulos continuam alinhados à esquerda. No celular
+       volta para a esquerda (regra no @media lá embaixo), porque em coluna
+       estreita o justificado abre buracos entre as palavras. */
+    .markdown-section p,
+    .markdown-section li,
+    .markdown-section blockquote p {
+      text-align: justify;
+      -webkit-hyphens: auto;
+      hyphens: auto;
+    }
     .markdown-section strong { color: var(--text-strong); font-weight: 600; }
     .markdown-section a { color: var(--brand-light); text-decoration: none; }
     .markdown-section a:hover { text-decoration: underline; }
@@ -430,6 +442,13 @@
       .markdown-section { padding: 64px 18px 60px; }
       .markdown-section h1 { font-size: 1.65rem; }
       .markdown-section h2 { font-size: 1.3rem; }
+      .markdown-section p,
+      .markdown-section li,
+      .markdown-section blockquote p {
+        text-align: left;
+        -webkit-hyphens: manual;
+        hyphens: manual;
+      }
 
       /* Tabela larga rola na horizontal em vez de espremer as colunas
          (sem isso, cada celula quebra palavra por palavra no celular) */
